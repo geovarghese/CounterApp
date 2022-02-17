@@ -5,8 +5,8 @@ function Dropdown({ selected, setSelected }) {
   const [isActive, setIsActive] = useState(false);
   const options = ["React", "Vue", "Angular"];
   const [toggleDropDown, cycleToggleDropDown] = useCycle(
-    "dropdownItemVariants",
-    "dropdownItemCollapseVariants"
+    "dropdownVariants",
+    "dropdownUpVariants"
   );
 
   const svgDownVariants = {
@@ -32,29 +32,37 @@ function Dropdown({ selected, setSelected }) {
   const dropdownVariants = {
     hidden: { height: 0 },
     visible: {
-      height: 200,
+      height: 150,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.2,
+      },
+    },
+    exit: {
+      height: 0,
       transition: {
         duration: 1,
+        ease: "easeInOut",
       },
     },
   };
 
   const dropdownItemVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, x: -50 },
     visible: {
       opacity: 1,
+      x: 0,
       transition: {
-        duration: 1.5,
+        duration: 0.8,
+        ease: "easeInOut",
       },
     },
-  };
-
-  const dropdownItemCollapseVariants = {
-    hidden: { opacity: 1 },
-    visible: {
+    exit: {
       opacity: 0,
+      x: -50,
       transition: {
-        duration: 1.5,
+        duration: 0.7,
+        ease: "easeInOut",
       },
     },
   };
@@ -114,7 +122,7 @@ function Dropdown({ selected, setSelected }) {
         </div> */}
 
           <div
-            className="dropdown-btn"
+            className="dropdown-btn "
             onClick={(e) => {
               setIsActive(!isActive);
               cycleToggleDropDown();
@@ -156,37 +164,36 @@ function Dropdown({ selected, setSelected }) {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M19 9l-7 7-7-7"
-                  variants={pathVariants}
+                  // variants={pathVariants}
                 />
               </motion.svg>
             )}
           </div>
-
-          {isActive && (
-            <motion.div
-              className="dropdown-content"
-              variants={toggleDropDown}
-              initial="hidden"
-              animate="visible"
-            >
-              {options.map((option) => (
-                <motion.div
-                  key={option}
-                  onClick={(e) => {
-                    setSelected(option);
-                    setIsActive(false);
-                  }}
-                  className="dropdown-item"
-                  variants={dropdownItemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                >
-                  {option}
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
+          <AnimatePresence exitBeforeEnter>
+            {isActive && (
+              <motion.div
+                className="dropdown-content"
+                variants={dropdownVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {options.map((option) => (
+                  <motion.div
+                    key={option}
+                    onClick={(e) => {
+                      setSelected(option);
+                      setIsActive(false);
+                    }}
+                    className="dropdown-item"
+                    variants={dropdownItemVariants}
+                  >
+                    {option}
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </AnimatePresence>
     </>
